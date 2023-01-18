@@ -14,7 +14,7 @@ export default function Home({ coins }) {
       </Head>
       <main className='flex flex-col items-center'>
         {coins.items.map(coin => (
-          <Link className='py-4' href={'/coins/' + (coin.id).toLowerCase() + '-' + (coin.name).toLowerCase().replace(/\s/g, '-')}>
+          <Link key={coin.id} className='py-4' href={'/coins/' + (coin.id).toLowerCase() + '-' + (coin.name).toLowerCase().replace(/\s/g, '-')}>
             {coin.name}
           </Link>
         ))}
