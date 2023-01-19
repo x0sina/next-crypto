@@ -1,8 +1,41 @@
+import SingleCurrency from '@/components/SingleCurrency';
+import { useSocket } from '@/context/WebSocketProvider';
 import http from '@/services/HttpService'
 import Head from 'next/head'
-import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
-export default function Home({ coins }) {
+export default function Home({ currencies }) {
+  const socket = useSocket()
+  const [coins, setCoins] = useState(currencies.cryptoCurrencyList)
+
+  useEffect(() => {
+    if (socket.sendJsonMessage) {
+      if (socket.readyState === 1) {
+        if (socket.lastJsonMessage !== null) {
+          const updatedId = socket?.lastJsonMessage?.d?.cr?.id;
+          const updatedPrice = socket?.lastJsonMessage?.d?.cr?.p
+          const index = coins.findIndex(c => c.id === updatedId)
+          const selectedCurrency = coins[index]
+          if (+updatedPrice !== +(selectedCurrency.price)) {
+            const updatedCoins = [...coins]
+            updatedCoins[index].quotes[2].price = +updatedPrice
+            setCoins(updatedCoins)
+          }
+        }
+      }
+      else {
+        const currencyIds = currencies.cryptoCurrencyList.map(currency => currency.id)
+        socket?.sendJsonMessage({
+          method: "subscribe",
+          id: "price",
+          data: {
+            cryptoIds: currencyIds
+          }
+        })
+      }
+    }
+  }, [socket])
+
 
   return (
     <>
@@ -13,10 +46,8 @@ export default function Home({ coins }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className='flex flex-col items-center'>
-        {coins.items.map(coin => (
-          <Link key={coin.id} className='py-4' href={'/currencies/' + (coin.id).toLowerCase() + '-' + (coin.name).toLowerCase().replace(/\s/g, '-')}>
-            {coin.name}
-          </Link>
+        {coins.map(currency => (
+          <SingleCurrency key={currency.id} price={currency.quotes[2].price} currency={currency} />
         ))}
       </main>
     </>
@@ -24,10 +55,10 @@ export default function Home({ coins }) {
 }
 
 export const getServerSideProps = async (ctx) => {
-  const { data } = await http.get('/coins')
+  const { data } = await http.get('/data-api/v3/cryptocurrency/listing?&aux=ath,atl,high24h,low24h,num_market_pairs,cmc_rank,date_added,max_supply,circulating_supply,total_supply,volume_7d,volume_30d,self_reported_circulating_supply,self_reported_market_cap&convert=USD,BTC,ETH&cryptoType=all&tagType=all&start=1&limit=100')
   return {
     props: {
-      coins: data
+      currencies: data.data
     }
   }
 }
