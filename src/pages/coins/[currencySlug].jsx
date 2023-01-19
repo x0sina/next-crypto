@@ -10,7 +10,7 @@ const Coin = ({ coin }) => {
 export default Coin;
 
 export const getServerSideProps = async ({ params }) => {
-    const { data } = await http.get(`/coins/${params.coinSlug}`)
+    const { data } = await http.get(`/coins/${params.currencySlug}`)
     return {
         props: {
             coin: data.items[0]
