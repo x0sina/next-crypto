@@ -1,4 +1,4 @@
-import SingleCurrency from '@/components/SingleCurrency';
+import Table from '@/components/Table';
 import { useSocket } from '@/context/WebSocketProvider';
 import http from '@/services/HttpService'
 import Head from 'next/head'
@@ -13,14 +13,15 @@ export default function Home({ currencies }) {
       if (socket.readyState === 1) {
         if (socket.lastJsonMessage !== null) {
           const updatedId = socket?.lastJsonMessage?.d?.cr?.id;
-          const updatedPrice = socket?.lastJsonMessage?.d?.cr?.p
+          const updatedData = socket?.lastJsonMessage?.d?.cr
           const index = coins.findIndex(c => c.id === updatedId)
-          const selectedCurrency = coins[index]
-          if (+updatedPrice !== +(selectedCurrency.price)) {
-            const updatedCoins = [...coins]
-            updatedCoins[index].quotes[2].price = +updatedPrice
-            setCoins(updatedCoins)
-          }
+          const updatedCoins = [...coins]
+          if (+updatedData.p) updatedCoins[index].quotes[2].price = +updatedData.p
+          if (+updatedData.mc) updatedCoins[index].quotes[2].fullyDilluttedMarketCap = +updatedData.mc
+          if (+updatedData.p24h) updatedCoins[index].quotes[2].percentChange24h = +updatedData.p24h
+          if (+updatedData.p7d) updatedCoins[index].quotes[2].percentChange7d = +updatedData.p7d
+          if (+updatedData.v) updatedCoins[index].quotes[2].volume24h = +updatedData.v
+          setCoins(updatedCoins)
         }
       }
       else {
@@ -45,10 +46,9 @@ export default function Home({ currencies }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className='flex flex-col items-center'>
-        {coins.map(currency => (
-          <SingleCurrency key={currency.id} price={currency.quotes[2].price} currency={currency} />
-        ))}
+
+      <main>
+        <Table currencies={coins} />
       </main>
     </>
   )

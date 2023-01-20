@@ -16,7 +16,8 @@ const toFixed = (num) => {
     return num;
 }
 
-const fixPrice = (num, len) => {
+export const fixPrice = (num, len) => {
+    if (!len || len === 0) return Math.round(num).toLocaleString('en-US');
     return num.toFixed(len).replace(/\d(?=(\d{3})+\.)/g, '$&,');
 }
 const threeDots = (num) => {
@@ -26,7 +27,7 @@ const threeDots = (num) => {
     return '0.0...' + last4Digits
 }
 
-const toPrice = (price) => {
+export const toPrice = (price) => {
     if (price >= 1) {
         return fixPrice(price, 2)
     }
@@ -51,4 +52,6 @@ const toPrice = (price) => {
     else return threeDots(price)
 }
 
-export default toPrice
+export const isWhatPercentOf = (x, y) => {
+    return (x / y) * 100
+}
