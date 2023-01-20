@@ -1,3 +1,4 @@
+import toPrice from "@/utils/toPrice";
 import Link from "next/link";
 import { memo, useEffect, useRef, useState } from "react";
 
@@ -11,9 +12,11 @@ const SingleCurrency = ({ currency, price }) => {
         }, 4000)
     }, [animate])
     useEffect(() => {
-        console.log({ 'new price': price, 'prev price': prevPrice.current });
-        if (price > prevPrice.current) setAnimate('rise')
-        else if (price < prevPrice.current) setAnimate('fall')
+        if (prevPrice.current && (toPrice(price) !== toPrice(prevPrice.current))) {
+            console.log('horay');
+            if (price > prevPrice.current) setAnimate('rise')
+            else if (price < prevPrice.current) setAnimate('fall')
+        }
 
         prevPrice.current = price;
     }, [price]);
@@ -24,7 +27,7 @@ const SingleCurrency = ({ currency, price }) => {
                 {currency.name}
             </span>
             <span>
-                {price}
+                {toPrice(price)}
             </span>
         </Link>
     );
