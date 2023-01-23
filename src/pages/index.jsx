@@ -1,4 +1,4 @@
-import Table from '@/components/Table';
+import HomePageTable from '@/components/HomePageTable';
 import { useSocket } from '@/context/WebSocketProvider';
 import http from '@/services/HttpService'
 import Head from 'next/head'
@@ -9,6 +9,7 @@ export default function Home({ currencies }) {
   const [coins, setCoins] = useState(currencies.cryptoCurrencyList)
 
   useEffect(() => {
+    console.log(socket);
     if (socket.sendJsonMessage) {
       if (socket.readyState === 1) {
         if (socket.lastJsonMessage !== null) {
@@ -47,8 +48,8 @@ export default function Home({ currencies }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className='lg:w-11/12 lg:mx-auto w-full'>
-        <Table currencies={coins} />
+      <div className='lg:w-[90%] lg:mx-auto w-full'>
+        <HomePageTable currencies={coins} />
       </div>
     </>
   )

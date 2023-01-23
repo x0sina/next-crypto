@@ -6,7 +6,7 @@ import { memo, useEffect, useRef, useState } from "react";
 import Image from 'next/image'
 import { usePopper } from "react-popper";
 
-const SingleCurrency = ({ currency, price }) => {
+const HomePageTableRow = ({ currency, price }) => {
     const [animate, setAnimate] = useState(null)
     const prevPrice = useRef();
     const [referenceElement, setReferenceElement] = useState(null);
@@ -40,19 +40,23 @@ const SingleCurrency = ({ currency, price }) => {
                     {currency.cmcRank}
                 </p>
             </td>
-            <td className='p-1.5 md:p-2.5 !pr-0 py-3'>
-                <Link href={`/currencies/${currency.slug}`} className='flex items-center gap-x-3 max-w-fit'>
+            <td className='p-1.5 md:p-2.5 !pr-0'>
+                <Link href={`/currencies/${currency.slug}`} className='flex items-center gap-x-3 max-w-fit py-3'>
                     <Image width={24} height={24} className='rounded-full' src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${currency.id}.png`} alt="" />
-                    <div className="flex flex-col w-[130px] md:w-[160px] leading-5 md:flex-row justify-start items-start md:items-center">
-                        <p className="text-start font-semibold md:mr-1.5">{currency.name}</p>
+                    <div className="flex flex-col md:flex-row justify-start items-start md:items-center">
+                        <p className="text-start font-semibold md:mr-1.5 leading-5">{currency.name}</p>
                         <div className="flex items-center w-full md:w-fit">
                             <p className="text-xs mr-1 md:mr-1.5 px-1.5 py-0.5 md:hidden text-gray-800 rounded-md font-medium bg-gray-200 text-center">{currency.cmcRank}</p>
-                            <p className="text-gray-500 text-start text-xs font-semibold md:bg-gray-100 px-1 py-0.5 rounded-md w-16 sm:w-auto">{currency.symbol}</p>
+                            <p className="text-gray-500 text-start text-xs font-semibold md:bg-gray-100 px-1 py-0.5 rounded-md sm:w-auto">{currency.symbol}</p>
                         </div>
                     </div>
                 </Link>
             </td>
-            <td className={`${animate ? animate === 'rise' ? 'text-green-500' : 'text-red-500' : ''} !pl-0 p-1.5 md:p-2.5 transition-all duration-500`} href={`/currencies/${currency.slug}`}>${toPrice(price)}</td>
+            <td className={`${animate ? animate === 'rise' ? 'text-green-500' : 'text-red-500' : ''} p-1 md:p-2.5 transition-all duration-500`} href={`/currencies/${currency.slug}`}>
+                <p>
+                    ${toPrice(price)}
+                </p>
+            </td>
             <td className="p-1.5 md:p-2.5">
                 <div className="flex items-center justify-center gap-x-1">
                     {currency.quotes[2].percentChange1h >= 0 ? (
@@ -153,8 +157,8 @@ const SingleCurrency = ({ currency, price }) => {
                     <Image width={164} height={48} className={`whitespace-nowrap ${currency.quotes[2].percentChange7d > 0 ? 'hue-rotate-[85deg] saturate-[.8] brightness-[.85]' : 'hue-rotate-[300deg] saturate-[210%] brightness-[.7] contrast-[170%]'}`} src={`https://s3.coinmarketcap.com/generated/sparklines/web/7d/2781/${currency.id}.svg`} alt="" />
                 </div>
             </td>
-        </tr>
+        </tr >
     );
 }
 
-export default memo(SingleCurrency);
+export default memo(HomePageTableRow);

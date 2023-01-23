@@ -1,6 +1,6 @@
-import SingleCurrency from "./SingleCurrency";
+import HomePageTableRow from "./HomePageTableRow";
 
-const Table = ({ currencies }) => {
+const HomePageTable = ({ currencies }) => {
 
     return (
         <div className="w-full overflow-x-auto">
@@ -22,7 +22,7 @@ const Table = ({ currencies }) => {
                 </thead>
                 <tbody className="w-max">
                     {currencies.map(currency => (
-                        <SingleCurrency key={currency.id} price={currency.quotes[2].price} currency={currency} />
+                        <HomePageTableRow key={currency.id} price={currency.quotes[2].price} currency={currency} />
                     ))}
                 </tbody>
             </table>
@@ -30,4 +30,4 @@ const Table = ({ currencies }) => {
     );
 }
 
-export default Table;
+export default HomePageTable;
