@@ -4,12 +4,15 @@ import { HiOutlineStar } from 'react-icons/hi'
 import { VscTriangleDown, VscTriangleUp } from 'react-icons/vsc'
 import { memo, useEffect, useRef, useState } from "react";
 import Image from 'next/image'
+import { usePopper } from "react-popper";
 
 const SingleCurrency = ({ currency, price }) => {
-    if (currency.symbol == 'GUSD')
-        console.log(currency);
-    const prevPrice = useRef();
     const [animate, setAnimate] = useState(null)
+    const prevPrice = useRef();
+    const [referenceElement, setReferenceElement] = useState(null);
+    const [popperElement, setPopperElement] = useState(null);
+    const [hoverOpen, setHoverOpen] = useState(false)
+    const { styles, attributes } = usePopper(referenceElement, popperElement);
 
     useEffect(() => {
         setTimeout(() => {
@@ -26,7 +29,7 @@ const SingleCurrency = ({ currency, price }) => {
     }, [price]);
 
     return (
-        <tr className='font-semibold text-sm border-b leading-6 border-gray-100 transition-all duration-100 hover:bg-slate-50'>
+        <tr className='font-semibold text-sm border-b leading-6 border-gray-200 transition-all duration-100 hover:bg-slate-50'>
             <td className='p-1.5 md:p-2.5 table-cell'>
                 <button className='hover hover:text-orange-700 transition-all duration-100  mt-1.5'>
                     <HiOutlineStar className="h-4 w-4 text-inherit" />
@@ -41,10 +44,10 @@ const SingleCurrency = ({ currency, price }) => {
                 <Link href={`/currencies/${currency.slug}`} className='flex items-center gap-x-3 max-w-fit'>
                     <Image width={24} height={24} className='rounded-full' src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${currency.id}.png`} alt="" />
                     <div className="flex flex-col md:flex-row justify-start items-center">
-                        <p className="text-start w-full font-semibold md:mr-1.5 whitespace-normal md:whitespace-nowrap">{currency.name}</p>
+                        <p className="text-start w-full font-semibold md:mr-1.5 whitespace-normal sm:whitespace-nowrap">{currency.name}</p>
                         <div className="flex items-center w-full">
                             <p className="text-xs mr-1.5 px-1.5 py-0.5 md:hidden text-gray-800 rounded-md font-medium bg-gray-200 text-center">{currency.cmcRank}</p>
-                            <p className="text-gray-500 text-start text-xs font-semibold md:bg-gray-100 px-2 py-0.5 rounded-md">{currency.symbol}</p>
+                            <p className="text-gray-500 text-start text-xs font-semibold md:bg-gray-100 px-2 py-0.5 rounded-md w-16 sm:w-auto">{currency.symbol}</p>
                         </div>
                     </div>
                 </Link>
@@ -112,15 +115,38 @@ const SingleCurrency = ({ currency, price }) => {
                     <p className='text-xs text-gray-500 whitespace-normal'>{fixPrice(currency.quotes[2].volume24h / currency.quotes[2].price)} <span>{currency.symbol}</span></p>
                 </div>
             </td>
-            <td width={130} className='p-2.5 px-4'>
-                <div className='flex flex-col gap-y-1.5 whitespace-nowrap'>
-                    <p>{fixPrice(currency.circulatingSupply)} <span>{currency.symbol}</span></p>
-                    {currency.maxSupply ? (
+            <td width={130} className='p-2.5 px-4 relative'>
+                <button className={`${!currency.maxSupply && 'cursor-default'} w-full text-end`} onMouseEnter={(() => setHoverOpen(true))} onMouseLeave={() => setHoverOpen(false)} ref={setReferenceElement}>
+                    <div className='flex flex-col gap-y-1.5 whitespace-nowrap'>
+                        <p>{fixPrice(currency.circulatingSupply)} <span>{currency.symbol}</span></p>
+                        {currency.maxSupply ? (
+                            <div className="w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
+                                <div className="bg-slate-400 h-1.5 rounded-full dark:bg-gray-500" style={{ width: `${isWhatPercentOf(currency.circulatingSupply, currency.maxSupply)}%` }}></div>
+                            </div>
+                        ) : ''}
+                    </div>
+                </button>
+                {currency.maxSupply ? (
+                    <div className={`transition-all text-xs absolute w-80 duration-300 flex flex-col gap-y-2 z-20 bg-white rounded-md p-4 shadow ${hoverOpen ? 'opacity-100' : 'invisible opacity-0'}`} ref={setPopperElement} style={styles.popper} {...attributes.popper}>
+                        <div className="flex items-center justify-between">
+                            <span className="">Percentage</span>
+                            <span className="">{isWhatPercentOf(currency.circulatingSupply, currency.maxSupply).toFixed(2)}%</span>
+                        </div>
                         <div className="w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
                             <div className="bg-slate-400 h-1.5 rounded-full dark:bg-gray-500" style={{ width: `${isWhatPercentOf(currency.circulatingSupply, currency.maxSupply)}%` }}></div>
                         </div>
-                    ) : ''}
-                </div>
+                        <div className="flex flex-col gap-y-2">
+                            <div className="flex items-center justify-between">
+                                <span>Circulating Supply</span>
+                                <p>{fixPrice(currency.circulatingSupply)} <span>{currency.symbol}</span></p>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span>Max Supply</span>
+                                <p>{fixPrice(currency.maxSupply)} <span>{currency.symbol}</span></p>
+                            </div>
+                        </div>
+                    </div>
+                ) : ''}
             </td>
             <td className='p-1.5 md:p-2.5 py-3 md:py-4 min-w-[164px]'>
                 <div className="w-full">
