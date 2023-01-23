@@ -47,9 +47,9 @@ export default function Home({ currencies }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <>
+      <div className='lg:w-11/12 lg:mx-auto w-full'>
         <Table currencies={coins} />
-      </>
+      </div>
     </>
   )
 }
