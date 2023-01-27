@@ -1,9 +1,10 @@
+import MobilePriceData from "@/components/MobilePriceData";
 import http from "@/services/HttpService";
 
 const currency = ({ currency }) => {
     const { detail, article, trending, gravityFlag, projectInfoFlag, airDropFlag, announcement, mainAccount } = currency
     return (
-        <div>{detail.name}</div>
+        <MobilePriceData currency={currency} />
     );
 }
 
